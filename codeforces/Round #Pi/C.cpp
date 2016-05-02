@@ -24,7 +24,7 @@ int main(){
 		
 		int low = (int) (lower_bound(v.begin(), v.end(), i+1) - v.begin());
 		int up = (int) (upper_bound(v2.begin(), v2.end(), i-1) - v2.begin());
-		ans += (v.size() - low)*(up);
+		ans += (long long)(v.size() - low)*(up);
 	}
 
 	printf("%lld\n", ans);
