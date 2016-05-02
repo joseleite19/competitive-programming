@@ -20,7 +20,7 @@ int main(){
 	for(int i = 0; i < n; i++){
 		if(a[i] % k) continue;
 		auto &v = indexes[ (long long) k * a[i] ];
-		auto & v2 = indexes[ a[i] / k ];
+		auto &v2 = indexes[ a[i] / k ];
 		
 		int low = (int) (lower_bound(v.begin(), v.end(), i+1) - v.begin());
 		int up = (int) (upper_bound(v2.begin(), v2.end(), i-1) - v2.begin());
