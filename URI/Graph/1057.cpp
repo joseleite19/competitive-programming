@@ -1,13 +1,14 @@
 #include <bits/stdc++.h>
-#include <unistd.h>
+
 using namespace std;
 
 typedef pair<int, int> pii;
 typedef vector<pair<int, int>> vii;
 
+#define ff first
+#define ss second
 #define mp make_pair
 #define pb push_back
-#define INF 1000000000000000007
 
 int n;
 char mapa[10][10];
@@ -16,30 +17,18 @@ long long dist[10][10][10][10][10][10];
 bool obstaculo(const pii &p){
 	return mapa[p.first][p.second] == '#';
 }
-pii cima(const pii &p){
-	if(p.first+1 < n && !obstaculo({p.first+1, p.second})) return {p.first+1, p.second};
-	return p;
-}
-pii baixo(const pii &p){
-	if(p.first > 0 && !obstaculo({p.first-1, p.second})) return {p.first-1, p.second};
-	return p;
-}
-pii dir(const pii &p){
-	if(p.second+1 < n && !obstaculo({p.first, p.second+1})) return {p.first, p.second+1};
-	return p;
-}
-pii esq(const pii &p){
-	if(p.second > 0 && !obstaculo({p.first, p.second-1})) return {p.first, p.second-1};
-	return p;
+
+long long &elemento(const vii v){
+	return dist[v[0].first][v[0].second][v[1].first][v[1].second][v[2].first][v[2].second];
 }
 
-long long &elemento(const pii &a, const pii &b, const pii &c){
-	return dist[a.first][a.second][b.first][b.second][c.first][c.second];
+bool chegouNoFim(const vii v){
+	return (mapa[v[0].first][v[0].second] == 'X' && mapa[v[1].first][v[1].second] == 'X' && mapa[v[2].first][v[2].second] == 'X');
 }
 
 int main(){
 	int T;
-	pii people[3];
+	vii people(3);
 
 	scanf("%d", &T);
 
@@ -58,86 +47,49 @@ int main(){
 			}
 		}
 
-		// cout << people[0].first << " " << people[0].second << endl;
-		// cout << people[1].first << " " << people[1].second << endl;
-		// cout << people[2].first << " " << people[2].second << endl;
+		memset(dist, -1, sizeof dist);
 
 		queue<vii>q;
 
-		for(int i = 0; i < n; i++) for(int j = 0; j < n; j++)
-			for(int k = 0; k < n; k++) for(int q = 0; q < n; q++)
-				for(int w = 0; w < n; w++) for(int e = 0; e < n; e++)
-					dist[i][j][k][q][w][e] = INF;
-
+		elemento(people) = 0;
 		q.push({people[0],people[1],people[2]});
-		elemento(people[0], people[1], people[2]) = 0;
 
-		// printf("dasda\n"); fflush(stdout);
-		int i = 0;
-		long long ans1 = INF;
+		long long ans = -1;
+		int dx[] = {1, -1, 0, 0};
+		int dy[] = {0, 0, 1, -1};
 		while(!q.empty()){
-			const pii a = q.front()[0];
-			const pii b = q.front()[1];
-			const pii c = q.front()[2]; q.pop();
-			// cerr << elemento({2, 3}, {1, 2}, {3, 1}) << endl;
-
-			pii aux1, aux2, aux3;
-			const long long &dAntes = elemento(a, b, c);
-
-			aux1 = cima(a);
-			aux2 = cima(b);
-			aux3 = cima(c);
-
-			// cout << a.first << " " << a.second << endl;
-			// cout << b.first << " " << b.second << endl;
-			// cout << c.first << " " << c.second << endl << endl;
-
-			long long &up = elemento(aux1, aux2, aux3);
-			if(up == INF && aux1 != aux2 && aux1 != aux3 && aux2 != aux3){
-				up = dAntes + 1;
-				// if(aux1 == mp(5, 3) && aux2 == mp(4, 2) && aux3 == mp(5, 1)) {cerr << "dasda" << dist[5][3][4][2][5][1] << endl;}
-				q.push({aux1, aux2, aux3});
-			}
+			vii s = q.front(); q.pop();
 			
-			aux1 = baixo(a);
-			aux2 = baixo(b);
-			aux3 = baixo(c);
-
-			long long &down = elemento(aux1, aux2, aux3);
-			if(down == INF && aux1 != aux2 && aux1 != aux3 && aux2 != aux3){
-				down = dAntes + 1;
-				q.push({aux1, aux2, aux3});
+			if(chegouNoFim(s)){
+				ans = elemento(s);
+				break;
 			}
-			
-			aux1 = dir(a);
-			aux2 = dir(b);
-			aux3 = dir(c);
 
-			long long &rigth = elemento(aux1, aux2, aux3);
-			if(rigth == INF && aux1 != aux2 && aux1 != aux3 && aux2 != aux3){
-				rigth = dAntes + 1;
-				q.push({aux1, aux2, aux3});
-			}
-			
-			aux1 = esq(a);
-			aux2 = esq(b);
-			aux3 = esq(c);
+			vii v(3);
+			const long long &dAntes = elemento(s);
+			for(int i = 0; i < 4; i++){
+				v[0] = {s[0].ff + dx[i], s[0].ss + dy[i]};
+				v[1] = {s[1].ff + dx[i], s[1].ss + dy[i]};
+				v[2] = {s[2].ff + dx[i], s[2].ss + dy[i]};
 
-			long long &left = elemento(aux1, aux2, aux3);
-			if(left == INF && aux1 != aux2 && aux1 != aux3 && aux2 != aux3){
-				left = dAntes + 1;
-				q.push({aux1, aux2, aux3});
+				for(int j = 0; j < 3; j++)
+					if(v[j].ff < 0 || v[j].ff >= n || v[j].ss < 0 || v[j].ss >= n || obstaculo(v[j]))
+						v[j].ff -= dx[i], v[j].ss -= dy[i];
+
+				for(int j = 0, next = 1, nextnext = 2; j < 3; j++, next = (next+1)%3, nextnext = (nextnext+1)%3)
+					if((v[j] == v[next] && v[next] == s[next]) || (v[j] == v[nextnext] && v[nextnext] == s[nextnext])) // se n fica em cima de uma que não pode se mover por exemplo A.CB nao vira .A.E (E é sobreposição de B e C)
+						v[j].ff -= dx[i], v[j].ss -= dy[i];
+
+				long long &el = elemento(v);
+				if(el == -1 && v[0] != v[1] && v[0] != v[2] && v[1] != v[2]){
+					el = dAntes + 1;
+					q.push({v[0], v[1], v[2]});
+				}				
 			}
-			// cerr << q.size() << endl;
-			// usleep(500000);
 		}
-		pii &a = objetivos[0];
-		pii &b = objetivos[1];
-		pii &c = objetivos[2];
-		
-		long long ans = min(min(min(min(min(elemento(a, b, c), elemento(a, c, b)), elemento(b, a, c)), elemento(b, c, a)), elemento(c, a, b)), elemento(c, b, a));
+
 		printf("Case %d: ", t);
-		if(ans == INF) printf("trapped\n");
+		if(ans == -1) printf("trapped\n");
 		else printf("%lld\n", ans);
 	}
 
