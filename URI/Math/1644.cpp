@@ -1,8 +1,4 @@
 #include <cstdio>
-#include <cstring>
-#include <algorithm>
-
-using namespace std;
 
 int main(){
     int n, m, p[100], v[100], final[100];
