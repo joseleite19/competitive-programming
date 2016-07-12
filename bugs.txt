@@ -1,0 +1,8 @@
+Grafos bipartidos **NÃO** necessariamente são conexos.
+
+Ao testar todos os números na forma ABCD até menores ou iguais a XYZW, B só será limitado se A=X, C só será limitado ser A=X e B=Y e D só será limitado se A=X, B=Y e C=Z.
+
+MOD é lento!
+
+Sempre limpar a matriz antes de sair fazendo operações nela.
+
