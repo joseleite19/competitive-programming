@@ -144,6 +144,7 @@ int main(){
 	while(scanf("%d %s %s", &n, T, P) == 3){
 		int tam = strlen(P);
 		int taml = strlen(T);
+
 		SegTree st(tam, taml);
 
 		for(int i = 0; i <= tam - taml; i++){
@@ -155,10 +156,10 @@ int main(){
 				}
 			if(equal){
 				int bit = 0;
-				for(int j = 0; j < taml; j++){
+				for(int j = 0; j < taml; j++)
 					if(P[i+j] != T[j])
 						bit |= (1 << j);
-				}
+
 				st.put(i, bit);
 			}
 		}
