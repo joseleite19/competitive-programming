@@ -1,0 +1,8 @@
+vim /.vimrc
+
+set number
+set ignorecase
+set tabstop=4
+set autoindent
+set cindent
+
