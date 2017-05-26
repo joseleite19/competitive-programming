@@ -79,9 +79,19 @@ int main(){
 
 		for(int i = 0; i < (int)vet1.size(); i++){
 			int id = int(lower_bound(vet2.begin(), vet2.end(), d - (vet1[i]+1)) - vet2.begin());
+			printf("%lld %lld %lld %lld %d\n", tot, sum[id], (n[1] - id)*(vet1[i]+1), id*d, n[1] == vet2.size());
 			ans += tot - sum[id] + (n[1] - id)*(vet1[i]+1) + id*d;
 		}
-		printf("%.3lf\n", (double)ans/(n[0] * n[1]));
+		long long qwe = 0;
+		long long asd = 0;
+		for(int i = 0; i < (int)vet1.size(); i++)
+			qwe += vet1[i];
+		for(int i = 0; i < (int)vet2.size(); i++)
+			asd += vet2[i];
+		printf("%lld/%d %lld/%d; %lld\n", qwe, int(vet1.size()), asd, int(vet2.size()), ans);
+		double ans1 = double(qwe)/int(vet1.size()) + 1 + double(asd)/int(vet2.size());
+
+		printf("%.3lf %lf\n", (double)ans/(n[0] * n[1]), ans1);
 	}
 
 	return 0;

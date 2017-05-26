@@ -6,66 +6,78 @@
 
 using namespace std;
 
-int f(int n){
-	// printf("..%d\n", n);
-	if(n <= 0) return 0;
-	if(n == 1) return 1;
-	if(n == 2) return 3;
-	if(n == 3) return 5;
+set<int> ans;
 
-	return 2*f(n-3) + 2*f(2) + 1;
+set<int> g[100];
+
+void b(set<int> r, set<int> p, set<int> x){
+	if(p.empty() && x.empty()){
+		if(r.size() > ans.size())
+			ans = r;
+	}
+	while(!p.empty()){
+		int u = *p.begin(); p.erase(p.begin());
+
+		set<int> np, nx, nr;
+		for(int v : g[u]){
+			if(p.count(v)) np.insert(v);
+			if(x.count(v)) nx.insert(v);
+		}
+		nr = r;
+		nr.insert(u);
+		b(nr, np, nx);
+		x.insert(u);
+	}
 }
 
-int bfs(int n){
-	map< vector<vector<int> > , int > m;
-	queue<pair< vector<vector<int> >, int> > q;
-	vector<vector<int> > v;
-	v.assign(4, vector<int>());
-	for(int i = n; i > 0; i--)
-		v[0].push_back(i);
-	// v[0].push_back(8);
-	// v[0].push_back(7);
-	// v[0].push_back(6);
-	// v[0].push_back(5);
-	// v[0].push_back(4);
-	// v[0].push_back(3);
-	// v[0].push_back(2);
-	// v[0].push_back(1);
-	m[v] = 0;
-	q.push(mp(v, 0));
+pair<string, string> v[50];
 
-	swap(v[0], v[3]);
-
-	while(!q.empty()){
-		vector<vector<int> > u = q.front().ff;
-		int d = q.front().ss; q.pop();
-		if(u == v) break;
-		if(m[u] != d) continue;
-
-		for(int i = 0; i < 4; i++){
-			if(u[i].size() == 0) continue;
-			for(int j = 0; j < 4; j++){
-				if(i == j) continue;
-				if(u[j].size() > 0 && u[i].back() > u[j].back()) continue;
-				vector<vector<int> > newv = u;
-				newv[j].push_back(newv[i].back());
-				newv[i].pop_back();
-				if(m.count(newv)) continue;
-				m[ newv ] = m[u] + 1;
-				q.push(mp(newv, m[ newv ]));
-			}
-		}
+int getnum(char *s, int &i){
+	int ans = 0;
+	int sig = 1;
+	while(s[i] && !(s[i] >= '0' && s[i] <= '9')){
+		if(s[i] == '-') sig = -1;
+		i++;
 	}
-	return m[v];
+	while(s[i] && s[i] >= '0' && s[i] <= '9'){
+		ans = 10*ans + (s[i]-'0');
+		i++;
+	}
+	return sig * ans;
 }
 
 int main(){
-	printf("%d %d\n", f(10), bfs(10));
-	// int n;
 
-	// scanf("%d", &n);
+	char matr[50], nome[50], viz[50];
+	int x;
 
-	// printf("%d\n", f(n));
+	FILE *fp = fopen("amigos_tag20171.txt", "r");
+	if(!fp) return printf("Cant read file.\n"), 0;
+
+	istringstream is("-1");
+	int n = 1;
+	for(int i = 1; fscanf(fp, " %s | %[^|] | %[^\n]", matr, nome, viz) == 3; i++, n++){
+		v[i] = make_pair(matr, nome);
+		int id = 0;
+		while(1){
+			x = getnum(viz, id);
+			if(!x) break;
+			if(x == -1) break;
+			g[i].insert(x);
+			g[x].insert(i);
+		}
+	}
+
+	set<int> init;
+	for(int i = 1; i <= n; i++) init.insert(i);
+
+	b(set<int>(), init, set<int>());
+
+	for(int x : ans){
+		printf("%d %s %s\n", x, v[x].first.c_str(), v[x].second.c_str());
+	}
+
+
 
 	return 0;
 }
