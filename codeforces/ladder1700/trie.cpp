@@ -122,7 +122,7 @@ public:
 		return s;
 	}
 
-	bool was_visited(int id){
+	bool was_visited(int id) const{
 		return vis[ last_state[id] ];
 	}
 
@@ -138,20 +138,62 @@ public:
 	}
 };
 
+class Bit{
+    vector<int> ft;
+    int n;
+
+public:
+    Bit(int sz) : n(sz), ft(sz+1, 0) {}
+    int query(int x) const{
+        int ans = 0;
+        for(; x > 0; x -= x&-x)
+            ans = max(ans, ft[x]);
+        return ans;
+    }
+    void update(int x, int val){
+        for(; x <= n; x += x&-x)
+            ft[x] = max(ft[x], val);
+    }
+};
+
+const int N = 1000006;
+
+int t, p[N], c[N];
+int ft[N];
+int query(int x){
+    int ans = 0;
+    for(; x > 0; x -= x&-x){
+        ans = max(ans, ft[x]);
+    }
+    return ans;
+}
+void update(int x, int val){
+    for(; x < N; x += x&-x){
+        ft[x] = max(ft[x], val);
+    }
+}
+int n, k, ans, tmp;
 int main(){
 
-	int n, A, B;
+    scanf("%d", &t);
 
-	char s[10005];
+    for(int tc = 1; tc <= t; tc++){
+        scanf("%d %d", &n, &k);
+        for(int i = 0; i < n; i++)
+            scanf("%d", p+i);
+        memset(ft, 0, p[n-1]*sizeof(int));
 
-	vector<string> v;
-	scanf("%d %d %d", &A, &B, &n);
-	for(int i = 0; i < n; i++){
-		scanf(" %s", s);
-		v.push_back(s);
-	}
+        int ans = 0;
+        for(int i = 0; i < n; i++){
+            scanf("%d", c+i);
+            int tmp = query(p[i] - k) + c[i];
+            update(p[i], tmp);
+            ans = max(ans, tmp);
 
-	Aho a(v);
+        }
+        printf("%d\n", ans);
+    }
+
 
 	return 0;
 }
