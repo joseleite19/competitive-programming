@@ -6,6 +6,24 @@
 #define MOD 1000003
 
 using namespace std;
+class Bit{
+    int n;
+
+public:
+    vector<int> ft;
+    Bit(int sz) : n(sz), ft(sz+1, 0) {}
+    int query(int x) const{
+        int ans = 0;
+        for(; x > 0; x -= x&-x)
+            ans = max(ans, ft[x]);
+        return ans;
+    }
+    void update(int x, int val){
+        for(; x <= n; x += x&-x)
+            ft[x] = max(ft[x], val);
+    }
+};
+
 class Trie{
 protected:
 	vector<map<char, int> > trie;
@@ -55,6 +73,7 @@ class Aho : public Trie{
 	vector<bool> vis;
 	vector<vector<int> > pos;
 	vector<int> last_state;
+    vector<int> strsize;
 
 public:
 	void build_failures(){
@@ -90,11 +109,11 @@ public:
 	void back(int ptr, int id){
 		if(!ptr) return;
 		vis[ptr] = 1;
-		pos[ptr].push_back(id);
+		pos[ptr].push_back(id+1);
 		back(outputlink[ptr], id);
 	}
 
-	void run(string s){
+	pair<int, int> run(string s){
 		int ptr = 0;
 		for(int i = 0; i < s.size(); i++){
 			if(!has_edge(ptr, s[i])){
@@ -106,10 +125,21 @@ public:
 			}
 
 			ptr = change_state(ptr, s[i]);
-
 			if(is_final(ptr)) back(ptr, i);
 			else back(outputlink[ptr], i);
 		}
+        
+        Bit ft(s.size()+1);
+        for(int i = 0; i < last_state.size(); i++){
+            for(int j = pos[ last_state[i] ].size()-1; j >= 0; j--){
+                int id = pos[ last_state[i] ][j];
+                ft.update(id, ft.query(id-strsize[i])+1);
+            }
+        }
+        pair<int, int> ret;
+        ret.first = ft.query(s.size()+1);
+        ret.second = last_state.size();
+        return ret;
 	}
 
 	int has_output(int s) const{
@@ -129,8 +159,9 @@ public:
 	Aho(const vector<string> &v){
 		Trie();
 		last_state.assign(v.size(), 0);
+        strsize.assign(v.size(), 0);
 		for(int i = 0; i < v.size(); i++)
-			last_state[i] = insert_word(v[i]);
+			last_state[i] = insert_word(v[i]), strsize[i] = v[i].size();
 		vis.assign(size(), 0);
 		pos.assign(size(), vector<int>());
 		outputlink.assign(size(), 0);
@@ -138,70 +169,15 @@ public:
 	}
 };
 
-class Bit{
-    vector<int> ft;
-    int n;
-
-public:
-    Bit(int sz) : n(sz), ft(sz+1, 0) {}
-    int query(int x) const{
-        int ans = 0;
-        for(; x > 0; x -= x&-x)
-            ans = max(ans, ft[x]);
-        return ans;
-    }
-    void update(int x, int val){
-        for(; x <= n; x += x&-x)
-            ft[x] = max(ft[x], val);
-    }
-};
-
-const int N = 1000006;
-
-int t, p[N], c[N];
-int ft[N];
-int query(int x){
-    int ans = 0;
-    for(; x > 0; x -= x&-x){
-        ans = max(ans, ft[x]);
-    }
-    return ans;
-}
-void update(int x, int val){
-    for(; x < N; x += x&-x){
-        ft[x] = max(ft[x], val);
-    }
-}
-int n, k, ans, tmp;
 int main(){
 
-    scanf("%d", &t);
+    vector<string> v = {"a"};
 
-    for(int tc = 1; tc <= t; tc++){
-        scanf("%d %d", &n, &k);
-        for(int i = 0; i < n; i++)
-            scanf("%d", p+i);
-        memset(ft, 0, p[n-1]*sizeof(int));
+    Aho a(v);
+    pair<int, int> q = a.run("a");
+    printf("%d %d\n", q.first, q.second);
 
-        int ans = 0;
-        for(int i = 0; i < n; i++){
-            scanf("%d", c+i);
-            int tmp = query(p[i] - k) + c[i];
-            update(p[i], tmp);
-            ans = max(ans, tmp);
-
-        }
-        printf("%d\n", ans);
-    }
 
 
 	return 0;
 }
-// int ans = 0;
-// for(s : gabarito){
-// 	for(id : vec[ last_state[s] ]){
-// 		int x = st.query(0, id-s.size());
-// 		st.update(id, x);
-// 		ans = max(ans, x);
-// 	}
-// }

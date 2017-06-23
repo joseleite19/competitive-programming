@@ -11,6 +11,7 @@ int n;
 char s[100][100];
 
 int tmp[100];
+int tmp2[100];
 
 int main(){
 
@@ -30,7 +31,8 @@ int main(){
 	for(int i = 0; i < n; i++){
 		tmp[i] = target.find(s[i]);
 		if(tmp[i] == string::npos) return printf("-1\n"), 0;
-		printf("|%d\n", tmp[i]);
+        tmp2[i] = target.rfind(s[i]);
+		//printf("|%d %d\n", tmp[i], tmp2[i]);
 	}
 
 	int ans = 1000000000;
@@ -38,9 +40,9 @@ int main(){
 		int q = 0;
 		for(int i = 0; i < n; i++){
 			if(start >= tmp[i]) q += start - tmp[i];
-			else q += sz - tmp[i] + start;
+			else q += sz - tmp2[i] + start;
 		}
-		printf("%d\n", q);
+		//printf("%d\n", q);
 		ans = min(ans, q);
 	}
 
