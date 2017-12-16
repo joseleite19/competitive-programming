@@ -1,82 +1,61 @@
 #include <bits/stdc++.h>
 
+#define forn(i, n) for(int i = 0; i < int(n); ++i)
+
+#define MOD 13
+
 using namespace std;
 
-typedef long long Int;
-
-#define MAX ( (Int) 1 << 63 )-1
-#define gcc 10007
-Int p[10] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
-Int Gcd(Int x, Int y) { return y ? Gcd(y, x % y) : x; }
-
-inline Int produc_mod(Int a, Int b, Int mod) {
-	Int sum = 0;
-	a %= mod;
-	while(b){
-		if(b & 1) sum = (sum + a) % mod;
-		a = (a + a) % mod;
-		b /= 2;
-	}
-	return sum % mod;
+int add(int a, int b){
+    return a + b >= MOD ? a + b - MOD : a + b;
 }
 
-inline Int power_mod(Int a, Int b, Int mod) {
-	Int sum = 1;
-	while(b) {
-		if(b & 1) sum = produc_mod(sum, a, mod);
-		a = produc_mod(a, a, mod);
-		b /= 2;
-	}
-	return sum;
+int mul(int a, int b){
+    return (a * b) % MOD;
 }
 
-bool rabin_miller(Int n) {
-	int i, j, k = 0; Int u, m, buf;
-	if(n == 2) return true;
-	if(n < 2 || !(n & 1)) return false;
-	
-	m = n-1;
-	while(!(m & 1)) { k++; m /= 2; }
-	for(i = 0; i < 9; i++) {
-		if(p[i] >= n) return true;
-		
-		u = power_mod(p[i], m, n);
-		if(u == 1) continue;
-		
-		for(j = 0; j < k; j++) {
-			buf = produc_mod(u, u, n);
-			if(buf == 1 && u != 1 && u != n-1)
-				return false;
-			u = buf;
-		}
-		if(u-1) return false;
-	}
-	return true;
-}
+struct matrix{
+    int n;
+    vector<vector<int> > mat;
+    matrix(int sz = 0) : n(sz), mat(sz, vector<int>(sz, 0)) {}
+    matrix operator*(const matrix &o) const{
+        matrix ans(n);
+        forn(i, n) forn(j, n) forn(k, n){
+            ans.mat[i][j] = add(ans.mat[i][j], mul(mat[i][k], o.mat[k][j]));
+        }  
+        return ans;
+    }
+};
 
-double f(Int n){
-	if(n <= 1) return 0;
-	return n / log(n);
+matrix f(matrix a, long long k){
+    matrix ans(a.mat.size());
+    forn(i, ans.mat.size()) ans.mat[i][i] = 1;
+    while(k){
+        if(k & 1) ans = ans * a;
+        a = a * a;
+        k >>= 1;
+    }
+    return ans;
 }
 
 int main(){
-	int t;
-	Int a, b;
 
-	scanf("%d", &t);
+    int n;
+    long long k;
 
-	for(int tc = 1; tc <= t; tc++){
-		scanf("%lld %lld", &a, &b);
+    scanf("%d %lld", &n, &k);
 
-		int ans = 0;
-		for(Int x = a; x <= b; x++)
-			if(rabin_miller(x))
-				ans++;
+    matrix w(n);
 
+    forn(i, n) forn(j, n)
+        scanf("%d", &w.mat[i][j]);
 
-		printf("Teste %d: %.2lf\n", tc, ans - (f(b) - f(a-1)) + 1e-9);
-	}
+    w = f(w, k);
 
+    forn(i, n){
+        forn(j, n) printf(" %d", w.mat[i][j]);
+        printf("\n");
+    }
 
 	return 0;
 }

@@ -1,1 +1,0 @@
-git commit --date="`date --date='XX hours ago'`" -am "meu update"

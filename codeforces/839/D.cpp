@@ -6,7 +6,9 @@ using namespace std;
 
 const int N = 1000006;
 
-int used[N], d[N], lp[N], pot[N];
+int used[N], lp[N], pot[N];
+
+long long tmp[N];
 
 long long pow(long long b, long long e){
     long long ans = 1;
@@ -32,27 +34,24 @@ long long f(int x){
     return ans;
 }
 
+vector<int> d[N];
+
 int main(){
+
+    for(int i = 2; i < N; i++){
+        for(int j = i+i; j < N; j += i)
+            d[j].push_back(i);
+    }
 
     for(int i = 2; i < N; i++){
         if(!lp[i]){
             lp[i] = i;
-            pot[i] = 1;
             for(int j = i + i; j < N; j += i) if(!lp[j]){
                 lp[j] = i;
             }
         }
-        else{
-            int j = i, is = 1;
-            while(j > 1 && is){
-                if(lp[j] != lp[i]) is = false;
-                j /= lp[j];
-            }
-            if(is) pot[i] = 1;
-        }
     }
 
-    printf("%lld\n", f(3));
 
     int n;
     scanf("%d", &n);
@@ -64,14 +63,21 @@ int main(){
     }
 
     long long ans = 0;
-    for(int i = 2; i < N; i++) if(pot[i]){
+    for(int i = 2; i < N; i++){
         int qnt = 0;
         for(int j = i; j < N; j += i){
             qnt += used[j];
         }
-        ans = (ans + 1LL*f(qnt)*lp[i]) % MOD;
-        if(qnt) printf("%d %lld\n", i, f(qnt) * lp[i]);
+        tmp[i] = (1LL*f(qnt)*i) % MOD;
+        ans = (ans + tmp[i]) % MOD;
+        for(int x : d[i]) if(x != i){
+            ans = (ans - tmp[x] + MOD) % MOD;
+        }
+        //if(qnt) printf("%d %lld\n", i, f(qnt) * lp[i]);
     }
+
+    for(int i = 2; i < 10; i++)
+        printf("%d %lld\n", i, tmp[i]);
 
     printf("%lld\n", ans);
 

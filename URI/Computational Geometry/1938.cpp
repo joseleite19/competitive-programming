@@ -1,33 +1,42 @@
 #include <bits/stdc++.h>
 
+#define ff first
+#define ss second
+
 using namespace std;
 
+const int N = 3005;
+const int oo= 1000000000;
+
+pair<int, int> v[N];
+
 int main(){
-	vector<pair<int, int> > v;
 	int n;
 
 	scanf("%d", &n);
-	v.assign(n, pair<int, int>());
 
 	for(int i = 0; i < n; i++)
-		scanf("%d %d", &v[i].first, &v[i].second);
+		scanf("%d %d", &v[i].ff, &v[i].ss);
 
-	sort(v.begin(), v.end());
+	sort(v, v+n);
 
 	int ans = 0;
-	for(int i = 0; i < n; i++){ // pega em ordem pelo x e depois y
-		stack<int> top, down;
-		for(int j = 0; j < i; j++){ // os que vieram antes do i têm coordenada x menor
-			if(v[j].second > v[i].second){
-				while(!top.empty() && top.top() > v[j].second) top.pop();
-				top.push(v[j].second);
-			}
-			else{
-				while(!down.empty() && down.top() < v[j].second) down.pop();
-				down.push(v[j].second);
-			}
-		}
-		ans += top.size() + down.size();
+	for(int i = 0; i < n; i++){
+        int ymn = -oo, ymx = oo;
+        for(int j = i-1; j >= 0; j--){
+            if(v[j].ss > v[i].ss){
+                if(v[j].ss >= ymx)
+                    continue;
+                ans++;
+                ymx = v[j].ss;
+            }
+            else{
+                if(v[j].ss <= ymn)
+                    continue;
+                ans++;
+                ymn = v[j].ss;
+            }
+        }
 	}
 	printf("%d\n", ans);
 
